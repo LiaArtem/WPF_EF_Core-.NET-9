@@ -24,8 +24,7 @@ namespace WPF_EF_Core
 
             // подписываем textBox на событие PreviewTextInput, с помощью которого можно обрабатывать вводимый текст
             col_int.PreviewTextInput += new TextCompositionEventHandler(TextBox_PreviewTextInput_Int);
-            col_num.PreviewTextInput += new TextCompositionEventHandler(TextBox_PreviewTextInput_Float);
-            col_double.PreviewTextInput += new TextCompositionEventHandler(TextBox_PreviewTextInput_Float);
+            col_num.PreviewTextInput += new TextCompositionEventHandler(TextBox_PreviewTextInput_Float);            
         }
 
         // Сохранить

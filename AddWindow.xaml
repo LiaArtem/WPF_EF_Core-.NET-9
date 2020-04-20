@@ -18,17 +18,15 @@
                 <Label Content="ID:" Canvas.Left="5" Canvas.Top="5"/>
                 <TextBox x:Name="col_id" Canvas.Right ="10" Canvas.Top="10" MinWidth="150" TextWrapping="Wrap" MinHeight="20" MaxLength="11" TextAlignment ="Right" IsEnabled="False"/>
                 <Label Content="Текст:" Canvas.Left="5" Canvas.Top="30"/>
-                <TextBox x:Name="col_text" Canvas.Right ="10" Canvas.Top="35" MinWidth="150" TextWrapping="Wrap" MinHeight="20" MaxLength="11" TextAlignment ="Right"/>
+                <TextBox x:Name="col_text" Canvas.Right ="10" Canvas.Top="35" MinWidth="150" TextWrapping="Wrap" MinHeight="20" MaxLength="22" TextAlignment ="Left" SpellCheck.IsEnabled="True" Language="ru-ru"/>
                 <Label Content="Целое число:" Canvas.Left="5" Canvas.Top="55"/>
                 <TextBox x:Name="col_int" Canvas.Right ="10" Canvas.Top="60" MinWidth="150" TextWrapping="Wrap" MinHeight="20" MaxLength="20" TextAlignment ="Right"/>
                 <Label Content="Число:" Canvas.Left="5" Canvas.Top="80"/>
                 <TextBox x:Name="col_num" Canvas.Right ="10" Canvas.Top="85" MinWidth="150" TextWrapping="Wrap" MinHeight="20" MaxLength="20" TextAlignment ="Right"/>
                 <Label Content="Условие:" Canvas.Left="5" Canvas.Top="105"/>
                 <CheckBox x:Name="col_yes_no" Canvas.Right ="10" Canvas.Top="110" MinWidth="150"/>
-                <Label Content="Число (double):" Canvas.Left="5" Canvas.Top="130"/>
-                <TextBox x:Name="col_double" Canvas.Right ="10" Canvas.Top="135" MinWidth="150" TextWrapping="Wrap" MinHeight="20" MaxLength="20" TextAlignment ="Right"/>
-                <Label Content="Дата:" Canvas.Left="5" Canvas.Top="155"/>
-                <DatePicker x:Name="col_date" Canvas.Right="10" Canvas.Top="160" MinWidth="150"/>
+                <Label Content="Дата:" Canvas.Left="5" Canvas.Top="130"/>
+                <DatePicker x:Name="col_date" Canvas.Right="10" Canvas.Top="135" MinWidth="150"/>
                 <Button x:Name="button_save" Content="Сохранить" Canvas.Left ="10" Canvas.Bottom ="10" MinWidth="120" MinHeight="30" Click="Button_saveClick"/>
                 <Button x:Name="button_cancel" Content="Отменить" Canvas.Right ="10" Canvas.Bottom ="10" MinWidth="120" MinHeight="30" Click="Button_cancelClick"/>
             </Canvas>
