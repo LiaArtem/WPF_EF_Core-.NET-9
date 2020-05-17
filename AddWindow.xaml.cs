@@ -24,9 +24,9 @@ namespace WPF_EF_Core
                 UserDataAdd.DateValue = DateTime.Today;
             }
             // если класс пустой
-            if (UserDataAdd.DateValue == null)
+            if (UserDataAdd.BoolValue == null)
             {                
-                this.col_yes_no.Content = false;
+                this.col_yes_no.IsChecked = false;
                 UserDataAdd.BoolValue = false;
             }
             this.DataContext = UserDataAdd;

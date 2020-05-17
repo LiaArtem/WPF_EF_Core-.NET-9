@@ -1,20 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace WPF_EF_Core
 {
@@ -51,8 +42,7 @@ namespace WPF_EF_Core
         {
             get { return dateValue; }
             set { dateValue = value; OnPropertyChanged("DateValue"); }
-        }
-        public string ColorTypeValue { get; set; }
+        }        
 
         public event PropertyChangedEventHandler PropertyChanged;
         public void OnPropertyChanged([CallerMemberName]string prop = "")
@@ -94,6 +84,23 @@ namespace WPF_EF_Core
         {            
             DataGrid1.ItemsSource = db.UsersData.ToList();
             this.DataContext = db.UsersData.ToList();
+
+            // Выделить сроку с курсором
+            if (DataGrig_Id == null && DataGrid1.Items.Count > 0) DataGrig_Id = 1;
+
+            if (DataGrig_Id != null && DataGrid1.Items.Count > 0) 
+            {
+                foreach (UserData drv in DataGrid1.ItemsSource)
+                {
+                    if ( drv.Id == DataGrig_Id)
+                    {
+                        DataGrid1.SelectedItem = drv;
+                        DataGrid1.ScrollIntoView(drv);
+                        DataGrid1.Focus();
+                        break;
+                    }
+                }             
+            }            
         }
 
         // изменение типа базы данных
@@ -133,8 +140,7 @@ namespace WPF_EF_Core
                 IntValue = ud.IntValue,
                 DoubleValue = ud.DoubleValue,
                 BoolValue = ud.BoolValue,
-                DateValue = ud.DateValue,
-                ColorTypeValue = ud.ColorTypeValue
+                DateValue = ud.DateValue                
             }); 
 
             if (addWin.ShowDialog() == true)
@@ -152,6 +158,7 @@ namespace WPF_EF_Core
                     db.SaveChanges();
                     //
                     UpdateDatagrid();
+                    MessageBox("Запись обновлена");
                 }
             }
         }
@@ -159,6 +166,24 @@ namespace WPF_EF_Core
         // удалить запись
         private void Button_deleteClick(object sender, RoutedEventArgs e)
         {
+            // если ни одного объекта не выделено, выходим
+            if (DataGrid1.SelectedItem == null) return;
+
+            MessageBoxResult result = System.Windows.MessageBox.Show("Удалить запись ???", "Сообщение", System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Question);
+            switch (result)
+            {
+                case MessageBoxResult.Yes:
+                    // получаем выделенный объект
+                    UserData ud = DataGrid1.SelectedItem as UserData;
+                    db.UsersData.Remove(ud);
+                    db.SaveChanges();
+                    //
+                    UpdateDatagrid();
+                    MessageBox("Запись удалена");
+                    break;
+                case MessageBoxResult.No:                    
+                    break;
+            }
         }
 
         // обновить запись
@@ -171,12 +196,36 @@ namespace WPF_EF_Core
         private SolidColorBrush nb = new SolidColorBrush(Colors.AliceBlue);
         private void DataGrid1_LoadingRow(object sender, DataGridRowEventArgs e)
         {
-            UserData product = (UserData) e.Row.DataContext;
-
-            if (product.Id % 2 == 0)
+            //UserData product = (UserData) e.Row.DataContext;
+            //if (product.Id % 2 == 0)
+            if ((e.Row.GetIndex() + 1) % 2 == 0)
                 e.Row.Background = hb;
             else
                 e.Row.Background = nb;
+        }
+
+        // вывод диалогового окна
+        public static void MessageBox(String infoMessage)
+        {
+            System.Windows.MessageBox.Show(infoMessage, "Сообщение", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+        }
+
+        public int? DataGrig_Id;
+        private void DataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                var row_list = (UserData)DataGrid1.SelectedItem;
+                DataGrig_Id = row_list.Id;                
+            }
+            catch {
+                DataGrig_Id = null;
+            }
+        }
+
+        private void DataGrid_MouseDoubleClick(object sender, RoutedEventArgs e)
+        {
+            Button_updateClick(sender, e);            
         }
 
     }
