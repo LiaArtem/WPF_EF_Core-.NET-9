@@ -1,15 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace WPF_EF_Core
 {
@@ -18,27 +10,38 @@ namespace WPF_EF_Core
     /// </summary>
     public partial class AddWindow : Window
     {
-        public AddWindow()
+        public UserData UserDataAdd { get; private set; }
+
+        public AddWindow(UserData ud)
         {
             InitializeComponent();
 
+            UserDataAdd = ud;                        
+            // если класс пустой
+            if (UserDataAdd.DateValue == null) 
+            {                
+                this.col_date.SelectedDate = DateTime.Today;
+                UserDataAdd.DateValue = DateTime.Today;
+            }
+            // если класс пустой
+            if (UserDataAdd.DateValue == null)
+            {                
+                this.col_yes_no.Content = false;
+                UserDataAdd.BoolValue = false;
+            }
+            this.DataContext = UserDataAdd;
+
             // подписываем textBox на событие PreviewTextInput, с помощью которого можно обрабатывать вводимый текст
             col_int.PreviewTextInput += new TextCompositionEventHandler(TextBox_PreviewTextInput_Int);
-            col_num.PreviewTextInput += new TextCompositionEventHandler(TextBox_PreviewTextInput_Float);            
+            col_num.PreviewTextInput += new TextCompositionEventHandler(TextBox_PreviewTextInput_Float);
         }
 
         // Сохранить
         private void Button_saveClick(object sender, RoutedEventArgs e)
         {
-            this.Close();
+            this.DialogResult = true;
         }
-
-        // Отменить
-        private void Button_cancelClick(object sender, RoutedEventArgs e)
-        {
-            this.Close();
-        }
-
+       
         private void TextBox_PreviewTextInput_Float(object sender, TextCompositionEventArgs e)
         {
             string inputSymbol = e.Text.ToString(); // можно вводить цифры и точку
