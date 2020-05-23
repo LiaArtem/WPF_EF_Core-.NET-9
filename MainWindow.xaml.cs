@@ -288,6 +288,8 @@ namespace WPF_EF_Core
                 e.Row.Background = hb;
             else
                 e.Row.Background = nb;
+
+            // А можно в WPF установить - RowBackground - для нечетных строк и AlternatingRowBackground
         }
 
         // вывод диалогового окна

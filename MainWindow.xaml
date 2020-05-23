@@ -90,7 +90,8 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
             <DataGrid x:Name="DataGrid1" Margin="0,18,5,-3" AutoGenerateColumns="False" IsReadOnly="True" LoadingRow="DataGrid1_LoadingRow" 
-                      ItemsSource="{Binding}" SelectionChanged="DataGrid_SelectionChanged" MouseDoubleClick="DataGrid_MouseDoubleClick">
+                      ItemsSource="{Binding}" SelectionChanged="DataGrid_SelectionChanged" MouseDoubleClick="DataGrid_MouseDoubleClick"
+                      SelectionMode ="Single" SelectionUnit="FullRow">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Id" Binding="{Binding Id}" MinWidth="70" Width="*" HeaderStyle="{StaticResource CenterHeaderStyle}"/>
                         <DataGridTextColumn Header="Текст" Binding="{Binding TextValue}" MinWidth="90" Width="*" ElementStyle="{StaticResource RightAlignedCell}" HeaderStyle="{StaticResource CenterHeaderStyle}"/>
