@@ -99,6 +99,7 @@ namespace WPF_EF_Core
     {
         ApplicationContext db;
         Boolean is_initialize = true;
+        Boolean is_filter = false;
 
         public MainWindow()
         {
@@ -162,11 +163,26 @@ namespace WPF_EF_Core
         });
 
         private void UpdateDatagrid()
-        {
+        {            
             if (is_initialize == true) return;
 
-            DataGrid1.ItemsSource = db.UsersData.ToList();
-            this.DataContext = db.UsersData.ToList();
+            if (is_filter == false)
+            {
+                DataGrid1.ItemsSource = db.UsersData.ToList();                
+            }
+            else
+            {
+                String m_value1 = value1.ToString();
+                int m_value1_int;
+                Boolean m_er;
+
+                if (value_type.Text == "id")
+                {
+                    m_er = int.TryParse(m_value1, out m_value1_int);
+                    DataGrid1.ItemsSource = db.UsersData.ToList().Where(p => p.Id == m_value1_int);
+                }
+            }
+            this.DataContext = DataGrid1.ItemsSource; //db.UsersData.ToList();
 
             // Выделить сроку с курсором
             if (DataGrig_Id == null && DataGrid1.Items.Count > 0) DataGrig_Id = 1;
@@ -316,6 +332,52 @@ namespace WPF_EF_Core
         {
             Button_updateClick(sender, e);            
         }
+
+        // применить фильтр
+        private void Button_findClick(object sender, RoutedEventArgs e)
+        {
+            is_filter = true;
+            // если ни одного объекта не выделено, выходим
+            if (DataGrid1.SelectedItem == null) return;
+            
+            UpdateDatagrid();
+        }
+
+        // отменить фильтр
+        private void Button_find_cancelClick(object sender, RoutedEventArgs e)
+        {
+            is_filter = false;
+            value1.Text = "";
+            value2.Text = "";
+
+            // если ни одного объекта не выделено, выходим
+            if (DataGrid1.SelectedItem == null) return;
+
+            UpdateDatagrid();
+        }      
+
+        // изменение типа данных
+        private void Value_type_SelectedIndexChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (is_initialize == true) return;
+
+            ComboBox comboBox = (ComboBox)sender;
+            ComboBoxItem selectedItem = (ComboBoxItem)comboBox.SelectedItem;
+            String value_type = selectedItem.Content.ToString();
+
+            if (value_type == "id") value2.IsEnabled = true;
+            else if (value_type == "text") {value2.IsEnabled = false; value2.Text = ""; }
+            else if (value_type == "int") value2.IsEnabled = true;
+            else if (value_type == "double") value2.IsEnabled = true;
+            else if (value_type == "bool") { value2.IsEnabled = false; value2.Text = ""; }
+            else if (value_type == "date") value2.IsEnabled = true;            
+        }
+
+        // изменение фокуса на value2
+        private void Value2_GotKeyboardFocus(object sender, EventArgs e)
+        {
+            if (value1.Text != "") value2.Text = value1.Text;
+        }        
 
         // логирование действий с базой данных -> log.txt (свой провайдер)        
         public class MyLoggerProvider : ILoggerProvider
