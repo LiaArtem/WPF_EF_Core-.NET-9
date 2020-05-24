@@ -14,6 +14,7 @@ using Microsoft.Extensions.Logging.Console;
 using Microsoft.EntityFrameworkCore.Design;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Globalization;
 
 namespace WPF_EF_Core
 {
@@ -172,15 +173,48 @@ namespace WPF_EF_Core
             }
             else
             {
-                String m_value1 = value1.ToString();
-                int m_value1_int;
+                String m_value1 = value1.Text.ToString();
+                String m_value2 = value2.Text.ToString();
+                int m_value1_int; int m_value2_int;
+                double m_value1_dbl; double m_value2_dbl;
+                DateTime m_value1_dat; DateTime m_value2_dat;
+                Boolean m_value1_bool;
                 Boolean m_er;
 
                 if (value_type.Text == "id")
                 {
                     m_er = int.TryParse(m_value1, out m_value1_int);
-                    DataGrid1.ItemsSource = db.UsersData.ToList().Where(p => p.Id == m_value1_int);
+                    m_er = int.TryParse(m_value2, out m_value2_int);
+                    DataGrid1.ItemsSource = db.UsersData.ToList().Where(p => p.Id >= m_value1_int && p.Id <= m_value2_int);
                 }
+                else if (value_type.Text == "text")
+                {
+                    DataGrid1.ItemsSource = db.UsersData.ToList().Where(p => EF.Functions.Like(p.TextValue, "%" + m_value1 + "%"));
+                }
+                else if (value_type.Text == "int")
+                {
+                    m_er = int.TryParse(m_value1, out m_value1_int);
+                    m_er = int.TryParse(m_value2, out m_value2_int);
+                    DataGrid1.ItemsSource = db.UsersData.ToList().Where(p => p.IntValue >= m_value1_int && p.IntValue <= m_value2_int);
+                }
+                else if (value_type.Text == "double")
+                {
+                    m_er = double.TryParse(m_value1, out m_value1_dbl);
+                    m_er = double.TryParse(m_value2, out m_value2_dbl);
+                    DataGrid1.ItemsSource = db.UsersData.ToList().Where(p => p.DoubleValue >= m_value1_dbl && p.DoubleValue <= m_value2_dbl);
+                }
+                else if (value_type.Text == "bool")
+                {
+                    m_value1_bool = false;
+                    if (m_value1.ToUpper() == "T" || m_value1.ToLower() == "true") m_value1_bool = true;
+                    DataGrid1.ItemsSource = db.UsersData.ToList().Where(p => p.BoolValue == m_value1_bool);
+                }
+                else if (value_type.Text == "date")
+                {
+                    m_er = DateTime.TryParseExact(m_value1, "dd.MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out m_value1_dat);
+                    m_er = DateTime.TryParseExact(m_value2, "dd.MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out m_value2_dat);
+                    DataGrid1.ItemsSource = db.UsersData.ToList().Where(p => p.DateValue >= m_value1_dat && p.DateValue <= m_value2_dat);
+                }                
             }
             this.DataContext = DataGrid1.ItemsSource; //db.UsersData.ToList();
 
@@ -337,9 +371,6 @@ namespace WPF_EF_Core
         private void Button_findClick(object sender, RoutedEventArgs e)
         {
             is_filter = true;
-            // если ни одного объекта не выделено, выходим
-            if (DataGrid1.SelectedItem == null) return;
-            
             UpdateDatagrid();
         }
 
@@ -349,10 +380,6 @@ namespace WPF_EF_Core
             is_filter = false;
             value1.Text = "";
             value2.Text = "";
-
-            // если ни одного объекта не выделено, выходим
-            if (DataGrid1.SelectedItem == null) return;
-
             UpdateDatagrid();
         }      
 
