@@ -70,6 +70,7 @@
                         <ComboBoxItem Content="Oracle"/>
                         <ComboBoxItem Content="MySQL"/>
                         <ComboBoxItem Content="SQLite"/>
+                        <ComboBoxItem Content="PostgreSQL"/>
                 </ComboBox>
                     <GroupBox Header="Действия" Canvas.Left ="5" Canvas.Top="40" MinWidth="340" MinHeight="190">
                     <Canvas>

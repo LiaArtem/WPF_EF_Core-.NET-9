@@ -17,7 +17,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Globalization;
 
 namespace WPF_EF_Core
-{
+{    
     public class UserData
     {
         private string textValue;
@@ -80,9 +80,12 @@ namespace WPF_EF_Core
     {
         public DbSet<UserData> UsersData { get; set; }
         
-        public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options)
+        public ApplicationContext(DbContextOptions<ApplicationContext> options, bool p_is_no_ensure) : base(options)
         {
-            Database.EnsureCreated();
+            if (p_is_no_ensure == false)
+            {
+                Database.EnsureCreated();
+            }
 
             //Database.EnsureDeleted();   // удаляем бд со старой схемой
             //Database.EnsureCreated();   // создаем бд с новой схемой
@@ -100,7 +103,7 @@ namespace WPF_EF_Core
     {
         ApplicationContext db;
         Boolean is_initialize = true;
-        Boolean is_filter = false;
+        Boolean is_filter = false;        
 
         public MainWindow()
         {
@@ -121,19 +124,63 @@ namespace WPF_EF_Core
             // создаем конфигурацию
             var config = builder.Build();
             // получаем строку подключения
-            string conn_string = "";
+            string conn_string = "";            
             if (database_type == "MS SQL Server") conn_string = "DefaultConnection";
-            else if (database_type == "Oracle") conn_string = "DefaultConnection";
+            else if (database_type == "Oracle") conn_string = "DefaultConnectionOracle";
             else if (database_type == "MySQL") conn_string = "DefaultConnection";
-            else if (database_type == "SQLite") conn_string = "DefaultConnection";            
-           
+            else if (database_type == "SQLite") conn_string = "DefaultConnectionSQLite";
+            else if (database_type == "PostgreSQL") conn_string = "DefaultConnection";
+
             // строка подключения
             string connectionString = config.GetConnectionString(conn_string);
             var optionsBuilder = new DbContextOptionsBuilder<ApplicationContext>();
+
+            // MS SQL Server по умолчанию
             var options = optionsBuilder
-                .UseSqlServer(connectionString)
-                .UseLoggerFactory(MyLoggerFactory)
-                .Options;
+                    .UseSqlServer(connectionString)
+                    .UseLoggerFactory(MyLoggerFactory)
+                    .Options;            
+
+            if (database_type == "MS SQL Server")
+            {
+                optionsBuilder = new DbContextOptionsBuilder<ApplicationContext>();
+                options = optionsBuilder
+                    .UseSqlServer(connectionString)
+                    .UseLoggerFactory(MyLoggerFactory)
+                    .Options;
+            }
+            else if (database_type == "Oracle")
+            {
+                optionsBuilder = new DbContextOptionsBuilder<ApplicationContext>();
+                options = optionsBuilder
+                    .UseOracle(connectionString)
+                    .UseLoggerFactory(MyLoggerFactory)
+                    .Options;
+            }
+            else if (database_type == "MySQL")
+            {
+                optionsBuilder = new DbContextOptionsBuilder<ApplicationContext>();
+                options = optionsBuilder
+                    .UseSqlServer(connectionString)
+                    .UseLoggerFactory(MyLoggerFactory)
+                    .Options;
+            }
+            else if (database_type == "SQLite")
+            {
+                optionsBuilder = new DbContextOptionsBuilder<ApplicationContext>();
+                options = optionsBuilder
+                    .UseSqlite(connectionString)
+                    .UseLoggerFactory(MyLoggerFactory)
+                    .Options;
+            }
+            else if (database_type == "PostgreSQL")
+            {
+                optionsBuilder = new DbContextOptionsBuilder<ApplicationContext>();
+                options = optionsBuilder
+                    .UseSqlServer(connectionString)
+                    .UseLoggerFactory(MyLoggerFactory)
+                    .Options;
+            }
 
             return options;
         }
@@ -242,8 +289,15 @@ namespace WPF_EF_Core
             ComboBox comboBox = (ComboBox)sender;
             ComboBoxItem selectedItem = (ComboBoxItem)comboBox.SelectedItem;
             String database_type = selectedItem.Content.ToString();
-             
-            db = new ApplicationContext(LoadConfiguration(database_type));
+
+            bool p_is_no_ensure = false;
+            if (database_type == "MS SQL Server") p_is_no_ensure = false;
+            else if (database_type == "Oracle") p_is_no_ensure = true; // делается 1 раз, для создания, при повторном будет ошибка
+            else if (database_type == "MySQL") p_is_no_ensure = false;
+            else if (database_type == "SQLite") p_is_no_ensure = false;
+            else if (database_type == "PostgreSQL") p_is_no_ensure = false;
+
+            db = new ApplicationContext(LoadConfiguration(database_type), p_is_no_ensure);
             UpdateDatagrid();
         }
 
@@ -464,7 +518,7 @@ namespace WPF_EF_Core
             // получаем строку подключения из файла appsettings.json
             string connectionString = config.GetConnectionString("DefaultConnection");
             optionsBuilder.UseSqlServer(connectionString, opts => opts.CommandTimeout((int)TimeSpan.FromMinutes(10).TotalSeconds));
-            return new ApplicationContext(optionsBuilder.Options);
+            return new ApplicationContext(optionsBuilder.Options, false);
         }
     }
 }
