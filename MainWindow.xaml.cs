@@ -127,9 +127,9 @@ namespace WPF_EF_Core
             string conn_string = "";            
             if (database_type == "MS SQL Server") conn_string = "DefaultConnection";
             else if (database_type == "Oracle") conn_string = "DefaultConnectionOracle";
-            else if (database_type == "MySQL") conn_string = "DefaultConnection";
+            else if (database_type == "MySQL") conn_string = "DefaultConnectionMySQL";
             else if (database_type == "SQLite") conn_string = "DefaultConnectionSQLite";
-            else if (database_type == "PostgreSQL") conn_string = "DefaultConnection";
+            else if (database_type == "PostgreSQL") conn_string = "DefaultConnectionPostgreSQL";
 
             // строка подключения
             string connectionString = config.GetConnectionString(conn_string);
@@ -149,6 +149,14 @@ namespace WPF_EF_Core
                     .UseLoggerFactory(MyLoggerFactory)
                     .Options;
             }
+            else if (database_type == "SQLite")
+            {
+                optionsBuilder = new DbContextOptionsBuilder<ApplicationContext>();
+                options = optionsBuilder
+                    .UseSqlite(connectionString)
+                    .UseLoggerFactory(MyLoggerFactory)
+                    .Options;
+            }
             else if (database_type == "Oracle")
             {
                 optionsBuilder = new DbContextOptionsBuilder<ApplicationContext>();
@@ -161,15 +169,7 @@ namespace WPF_EF_Core
             {
                 optionsBuilder = new DbContextOptionsBuilder<ApplicationContext>();
                 options = optionsBuilder
-                    .UseSqlServer(connectionString)
-                    .UseLoggerFactory(MyLoggerFactory)
-                    .Options;
-            }
-            else if (database_type == "SQLite")
-            {
-                optionsBuilder = new DbContextOptionsBuilder<ApplicationContext>();
-                options = optionsBuilder
-                    .UseSqlite(connectionString)
+                    .UseMySQL(connectionString)
                     .UseLoggerFactory(MyLoggerFactory)
                     .Options;
             }
@@ -177,7 +177,7 @@ namespace WPF_EF_Core
             {
                 optionsBuilder = new DbContextOptionsBuilder<ApplicationContext>();
                 options = optionsBuilder
-                    .UseSqlServer(connectionString)
+                    .UseNpgsql(connectionString)
                     .UseLoggerFactory(MyLoggerFactory)
                     .Options;
             }

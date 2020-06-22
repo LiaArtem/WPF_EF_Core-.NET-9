@@ -67,11 +67,11 @@
                     <Label Content="Тип базы данных:" Canvas.Left="5" Canvas.Top="5"/>
                     <ComboBox x:Name="database_type" Canvas.Left ="115" Canvas.Top="10" MinWidth="200" SelectedIndex="0" SelectionChanged="Database_type_SelectedIndexChanged">
                         <ComboBoxItem Content="MS SQL Server"/>
+                        <ComboBoxItem Content="SQLite"/>
                         <ComboBoxItem Content="Oracle"/>
                         <ComboBoxItem Content="MySQL"/>
-                        <ComboBoxItem Content="SQLite"/>
                         <ComboBoxItem Content="PostgreSQL"/>
-                </ComboBox>
+                    </ComboBox>
                     <GroupBox Header="Действия" Canvas.Left ="5" Canvas.Top="40" MinWidth="340" MinHeight="190">
                     <Canvas>
                         <Button x:Name="button_insert" Template="{StaticResource btTemplate}" Content="Добавить запись" Canvas.Left ="10" Canvas.Top="10" MinWidth="310" MinHeight="30" Click="Button_insertClick"/>
