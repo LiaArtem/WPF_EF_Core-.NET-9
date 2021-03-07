@@ -9,24 +9,23 @@ using System.Windows.Media;
 using Microsoft.Extensions.Configuration;
 using System.IO;
 using Microsoft.Extensions.Logging;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.Extensions.Logging.Console;
 using Microsoft.EntityFrameworkCore.Design;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Globalization;
+using System.ComponentModel.DataAnnotations;
 
 namespace WPF_EF_Core
 {    
     public class UserData
     {
+        [Key]
+        public int? Id { get; set; }
         private string textValue;
         private int? intValue;
         private double? doubleValue;
         private Boolean? boolValue;
         private DateTime? dateValue;
-
-        public int? Id { get; set; }
+        [Timestamp]
+        public byte[] RowVersion { get; set; }
         public string TextValue
         {
             get { return textValue; }
@@ -64,6 +63,7 @@ namespace WPF_EF_Core
     //[Table("Mobiles")] - сопоставление с таблицей
     public class Country
     {
+        [Key]
         public int Id { get; set; }
         //[Required] // Аннотация, которая указывает, что свойство обязательно должно иметь значение.      
         //[NotMapped] // Не будет создавать объект в базе данных (столбец)
@@ -102,8 +102,8 @@ namespace WPF_EF_Core
     public partial class MainWindow : Window
     {
         ApplicationContext db;
-        Boolean is_initialize = true;
-        Boolean is_filter = false;        
+        readonly bool is_initialize = true;
+        bool is_filter = false;        
 
         public MainWindow()
         {
@@ -212,6 +212,7 @@ namespace WPF_EF_Core
 
         private void UpdateDatagrid()
         {            
+
             if (is_initialize == true) return;
 
             if (is_filter == false)
@@ -225,8 +226,8 @@ namespace WPF_EF_Core
                 int m_value1_int; int m_value2_int;
                 double m_value1_dbl; double m_value2_dbl;
                 DateTime m_value1_dat; DateTime m_value2_dat;
-                Boolean m_value1_bool;
-                Boolean m_er;
+                bool m_value1_bool;
+                bool m_er;
 
                 if (value_type.Text == "id")
                 {
@@ -283,13 +284,9 @@ namespace WPF_EF_Core
             }            
         }
 
-        // изменение типа базы данных
-        private void Database_type_SelectedIndexChanged(object sender, SelectionChangedEventArgs e)
-        {
-            ComboBox comboBox = (ComboBox)sender;
-            ComboBoxItem selectedItem = (ComboBoxItem)comboBox.SelectedItem;
-            String database_type = selectedItem.Content.ToString();
-
+        // чтение данных базы данных
+        private void ReadDatabase(String database_type)
+        {            
             bool p_is_no_ensure = false;
             if (database_type == "MS SQL Server") p_is_no_ensure = false;
             else if (database_type == "Oracle") p_is_no_ensure = true; // делается 1 раз, для создания, при повторном будет ошибка
@@ -298,6 +295,16 @@ namespace WPF_EF_Core
             else if (database_type == "PostgreSQL") p_is_no_ensure = false;
 
             db = new ApplicationContext(LoadConfiguration(database_type), p_is_no_ensure);
+        }
+
+        // изменение типа базы данных
+        private void Database_type_SelectedIndexChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ComboBox comboBox = (ComboBox)sender;
+            ComboBoxItem selectedItem = (ComboBoxItem)comboBox.SelectedItem;
+            String database_type = selectedItem.Content.ToString();
+            //
+            ReadDatabase(database_type);            
             UpdateDatagrid();
         }
 
@@ -311,6 +318,7 @@ namespace WPF_EF_Core
                 db.UsersData.Add(ud);
                 db.SaveChanges();
                 //
+                ReadDatabase(this.database_type.Text.ToString());
                 UpdateDatagrid();
             }            
         }
@@ -343,12 +351,23 @@ namespace WPF_EF_Core
                     ud.IntValue = addWin.UserDataAdd.IntValue;
                     ud.DoubleValue = addWin.UserDataAdd.DoubleValue;
                     ud.BoolValue = addWin.UserDataAdd.BoolValue;
-                    ud.DateValue = addWin.UserDataAdd.DateValue;                    
-                    db.Entry(ud).State = EntityState.Modified;
-                    db.SaveChanges();
-                    //
-                    UpdateDatagrid();
-                    MessageBox("Запись обновлена");
+                    ud.DateValue = addWin.UserDataAdd.DateValue;
+
+                    try
+                    {
+                        db.Entry(ud).State = EntityState.Modified;
+                        db.SaveChanges();
+                        //
+                        ReadDatabase(this.database_type.Text.ToString());
+                        UpdateDatagrid();
+                        MessageBox("Запись обновлена");
+                    }
+                    catch (DbUpdateConcurrencyException)
+                    {
+                        MessageBox("Запись заблокирована другим пользователем", System.Windows.MessageBoxImage.Warning);
+                        ReadDatabase(this.database_type.Text.ToString());
+                        UpdateDatagrid();
+                    }
                 }
             }
         }
@@ -368,8 +387,9 @@ namespace WPF_EF_Core
                     db.UsersData.Remove(ud);
                     db.SaveChanges();
                     //
+                    ReadDatabase(this.database_type.Text.ToString());
                     UpdateDatagrid();
-                    MessageBox("Запись удалена");
+                    MessageBox("Запись удалена");                    
                     break;
                 case MessageBoxResult.No:                    
                     break;
@@ -378,7 +398,8 @@ namespace WPF_EF_Core
 
         // обновить запись
         private void Button_selectClick(object sender, RoutedEventArgs e)
-        {
+        {            
+            ReadDatabase(this.database_type.Text.ToString());
             UpdateDatagrid();
         }
 
@@ -397,9 +418,9 @@ namespace WPF_EF_Core
         }
 
         // вывод диалогового окна
-        public static void MessageBox(String infoMessage)
+        public static void MessageBox(String infoMessage, MessageBoxImage mImage = System.Windows.MessageBoxImage.Information)
         {
-            System.Windows.MessageBox.Show(infoMessage, "Сообщение", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+            System.Windows.MessageBox.Show(infoMessage, "Сообщение", System.Windows.MessageBoxButton.OK, mImage);
         }
 
         public int? DataGrig_Id;
@@ -425,6 +446,7 @@ namespace WPF_EF_Core
         private void Button_findClick(object sender, RoutedEventArgs e)
         {
             is_filter = true;
+            ReadDatabase(this.database_type.Text.ToString());
             UpdateDatagrid();
         }
 
@@ -434,6 +456,7 @@ namespace WPF_EF_Core
             is_filter = false;
             value1.Text = "";
             value2.Text = "";
+            ReadDatabase(this.database_type.Text.ToString());
             UpdateDatagrid();
         }      
 
