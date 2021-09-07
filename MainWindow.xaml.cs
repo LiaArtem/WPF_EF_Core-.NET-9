@@ -224,8 +224,6 @@ namespace WPF_EF_Core
                 String m_value1 = value1.Text.ToString();
                 String m_value2 = value2.Text.ToString();
                 int m_value1_int; int m_value2_int;
-                double m_value1_dbl; double m_value2_dbl;
-                DateTime m_value1_dat; DateTime m_value2_dat;
                 bool m_value1_bool;
                 bool m_er;
 
@@ -247,8 +245,8 @@ namespace WPF_EF_Core
                 }
                 else if (value_type.Text == "double")
                 {
-                    m_er = double.TryParse(m_value1, out m_value1_dbl);
-                    m_er = double.TryParse(m_value2, out m_value2_dbl);
+                    m_er = double.TryParse(m_value1, out double m_value1_dbl);
+                    m_er = double.TryParse(m_value2, out double m_value2_dbl);
                     DataGrid1.ItemsSource = db.UsersData.ToList().Where(p => p.DoubleValue >= m_value1_dbl && p.DoubleValue <= m_value2_dbl);
                 }
                 else if (value_type.Text == "bool")
@@ -259,8 +257,8 @@ namespace WPF_EF_Core
                 }
                 else if (value_type.Text == "date")
                 {
-                    m_er = DateTime.TryParseExact(m_value1, "dd.MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out m_value1_dat);
-                    m_er = DateTime.TryParseExact(m_value2, "dd.MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out m_value2_dat);
+                    m_er = DateTime.TryParseExact(m_value1, "dd.MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime m_value1_dat);
+                    m_er = DateTime.TryParseExact(m_value2, "dd.MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime m_value2_dat);
                     DataGrid1.ItemsSource = db.UsersData.ToList().Where(p => p.DateValue >= m_value1_dat && p.DateValue <= m_value2_dat);
                 }                
             }
@@ -311,7 +309,7 @@ namespace WPF_EF_Core
         // добавить запись
         private void Button_insertClick(object sender, RoutedEventArgs e)
         {
-            AddWindow addWin = new AddWindow(new UserData());
+            AddWindow addWin = new(new UserData());
             if (addWin.ShowDialog() == true)
             {                
                 UserData ud = addWin.UserDataAdd;
@@ -331,7 +329,7 @@ namespace WPF_EF_Core
             // получаем выделенный объект
             UserData ud = DataGrid1.SelectedItem as UserData;
 
-            AddWindow addWin = new AddWindow(new UserData
+            AddWindow addWin = new(new UserData
             {
                 Id = ud.Id,
                 TextValue = ud.TextValue,
@@ -403,8 +401,8 @@ namespace WPF_EF_Core
             UpdateDatagrid();
         }
 
-        private readonly SolidColorBrush hb = new SolidColorBrush(Colors.MistyRose);
-        private readonly SolidColorBrush nb = new SolidColorBrush(Colors.AliceBlue);
+        private readonly SolidColorBrush hb = new(Colors.MistyRose);
+        private readonly SolidColorBrush nb = new(Colors.AliceBlue);
         private void DataGrid1_LoadingRow(object sender, DataGridRowEventArgs e)
         {
             //UserData product = (UserData) e.Row.DataContext;
@@ -491,7 +489,7 @@ namespace WPF_EF_Core
                 return new MyLogger();
             }
 
-            public void Dispose() { }
+            public void Dispose() { GC.SuppressFinalize(this); }
 
             private class MyLogger : ILogger
             {
@@ -533,7 +531,7 @@ namespace WPF_EF_Core
             var optionsBuilder = new DbContextOptionsBuilder<ApplicationContext>();
 
             // получаем конфигурацию из файла appsettings.json
-            ConfigurationBuilder builder = new ConfigurationBuilder();
+            ConfigurationBuilder builder = new();
             builder.SetBasePath(Directory.GetCurrentDirectory());
             builder.AddJsonFile("appsettings.json");
             IConfigurationRoot config = builder.Build();
