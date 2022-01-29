@@ -125,7 +125,8 @@ namespace WPF_EF_Core
             var config = builder.Build();
             // получаем строку подключения
             string conn_string = "";            
-            if (database_type == "MS SQL Server") conn_string = "DefaultConnection";
+            if (database_type == "MS SQL Server Local") conn_string = "DefaultConnection";
+            else if (database_type == "MS SQL Server") conn_string = "DefaultConnectionMSSQL";
             else if (database_type == "Oracle") conn_string = "DefaultConnectionOracle";
             else if (database_type == "MySQL") conn_string = "DefaultConnectionMySQL";
             else if (database_type == "SQLite") conn_string = "DefaultConnectionSQLite";
@@ -135,13 +136,21 @@ namespace WPF_EF_Core
             string connectionString = config.GetConnectionString(conn_string);
             var optionsBuilder = new DbContextOptionsBuilder<ApplicationContext>();
 
-            // MS SQL Server по умолчанию
+            // MS SQL Server Local по умолчанию
             var options = optionsBuilder
                     .UseSqlServer(connectionString)
-                    .UseLoggerFactory(MyLoggerFactory)
-                    .Options;            
+                    .UseLoggerFactory(MyLoggerFactory)                    
+                    .Options;
 
-            if (database_type == "MS SQL Server")
+            if (database_type == "MS SQL Server Local")
+            {
+                optionsBuilder = new DbContextOptionsBuilder<ApplicationContext>();
+                options = optionsBuilder
+                    .UseSqlServer(connectionString)
+                    .UseLoggerFactory(MyLoggerFactory)
+                    .Options;
+            }
+            else if (database_type == "MS SQL Server")
             {
                 optionsBuilder = new DbContextOptionsBuilder<ApplicationContext>();
                 options = optionsBuilder
@@ -286,7 +295,8 @@ namespace WPF_EF_Core
         private void ReadDatabase(String database_type)
         {            
             bool p_is_no_ensure = false;
-            if (database_type == "MS SQL Server") p_is_no_ensure = false;
+            if (database_type == "MS SQL Server Local") p_is_no_ensure = false;
+            else if (database_type == "MS SQL Server") p_is_no_ensure = false;
             else if (database_type == "Oracle") p_is_no_ensure = true; // делается 1 раз, для создания, при повторном будет ошибка
             else if (database_type == "MySQL") p_is_no_ensure = false;
             else if (database_type == "SQLite") p_is_no_ensure = false;
