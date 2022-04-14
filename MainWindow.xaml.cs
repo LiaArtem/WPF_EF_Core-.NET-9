@@ -80,12 +80,23 @@ namespace WPF_EF_Core
     {
         public DbSet<UserData> UsersData { get; set; }
         
-        public ApplicationContext(DbContextOptions<ApplicationContext> options, bool p_is_no_ensure) : base(options)
+        public ApplicationContext(DbContextOptions<ApplicationContext> options, String p_database_type) : base(options)
         {
-            if (p_is_no_ensure == false)
+            if (p_database_type == "Oracle")
             {
-                Database.EnsureCreated();
-            }
+                try
+                {
+                    Database.EnsureCreated();
+                }
+                catch (Oracle.ManagedDataAccess.Client.OracleException e)
+                {
+                    if (!e.Message.StartsWith("ORA-00955: name is already used by an existing object"))
+                    {
+                        throw new ArgumentException(e.Message);
+                    }                        
+                }
+                } else 
+              Database.EnsureCreated();            
 
             //Database.EnsureDeleted();   // удаляем бд со старой схемой
             //Database.EnsureCreated();   // создаем бд с новой схемой
@@ -108,7 +119,9 @@ namespace WPF_EF_Core
         public MainWindow()
         {
             InitializeComponent();
-         
+
+            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
             is_initialize = false;
             UpdateDatagrid();
         }
@@ -187,8 +200,8 @@ namespace WPF_EF_Core
                 optionsBuilder = new DbContextOptionsBuilder<ApplicationContext>();
                 options = optionsBuilder
                     .UseNpgsql(connectionString)
-                    .UseLoggerFactory(MyLoggerFactory)
-                    .Options;
+                    .UseLoggerFactory(MyLoggerFactory)                                        
+                    .Options;                
             }
 
             return options;
@@ -294,15 +307,7 @@ namespace WPF_EF_Core
         // чтение данных базы данных
         private void ReadDatabase(String database_type)
         {            
-            bool p_is_no_ensure = false;
-            if (database_type == "MS SQL Server Local") p_is_no_ensure = false;
-            else if (database_type == "MS SQL Server") p_is_no_ensure = false;
-            else if (database_type == "Oracle") p_is_no_ensure = true; // делается 1 раз, для создания, при повторном будет ошибка
-            else if (database_type == "MySQL") p_is_no_ensure = false;
-            else if (database_type == "SQLite") p_is_no_ensure = false;
-            else if (database_type == "PostgreSQL") p_is_no_ensure = false;
-
-            db = new ApplicationContext(LoadConfiguration(database_type), p_is_no_ensure);
+            db = new ApplicationContext(LoadConfiguration(database_type), database_type);
         }
 
         // изменение типа базы данных
@@ -323,7 +328,7 @@ namespace WPF_EF_Core
             if (addWin.ShowDialog() == true)
             {                
                 UserData ud = addWin.UserDataAdd;
-                db.UsersData.Add(ud);
+                db.UsersData.Add(ud);                
                 db.SaveChanges();
                 //
                 ReadDatabase(this.database_type.Text.ToString());
@@ -549,7 +554,7 @@ namespace WPF_EF_Core
             // получаем строку подключения из файла appsettings.json
             string connectionString = config.GetConnectionString("DefaultConnection");
             optionsBuilder.UseSqlServer(connectionString, opts => opts.CommandTimeout((int)TimeSpan.FromMinutes(10).TotalSeconds));
-            return new ApplicationContext(optionsBuilder.Options, false);
+            return new ApplicationContext(optionsBuilder.Options, "");
         }
     }
 }
