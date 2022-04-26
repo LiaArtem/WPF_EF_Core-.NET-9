@@ -150,8 +150,6 @@ namespace WPF_EF_Core
             string database_type = "MS SQL Server Local";
             using ApplicationContext db = new(LoadConfiguration(database_type), database_type);
             UpdateDatagrid(db);            
-            db.UsersData = null;
-            db.Dispose();
         }
 
         // загрузить NuGet
@@ -244,7 +242,8 @@ namespace WPF_EF_Core
             }
 
             // сохраняем строку подключения
-            if (ConnectionStringGlobal == "") { ConnectionStringGlobal = connectionString; }            
+            if (ConnectionStringGlobal == "") { ConnectionStringGlobal = connectionString; }
+            if (ConnectionStringGlobal != "") { connectionString = ConnectionStringGlobal; }
 
             // MS SQL Server Local по умолчанию
             var options = optionsBuilder
@@ -416,9 +415,7 @@ namespace WPF_EF_Core
             ConnectionStringGlobal = "";
             //            
             using ApplicationContext db = new(LoadConfiguration(database_type), database_type);
-            UpdateDatagrid(db);
-            db.UsersData = null;
-            db.Dispose();
+            UpdateDatagrid(db);            
         }
 
         // добавить запись
@@ -432,9 +429,7 @@ namespace WPF_EF_Core
                 using ApplicationContext db = new(LoadConfiguration(database_type), database_type);
                 db.UsersData.Add(ud);
                 db.SaveChanges();
-                UpdateDatagrid(db);
-                db.UsersData = null;
-                db.Dispose();
+                UpdateDatagrid(db);                
             }            
         }
 
@@ -474,17 +469,13 @@ namespace WPF_EF_Core
                     {
                         db.Entry(ud).State = EntityState.Modified;
                         db.SaveChanges();
-                        UpdateDatagrid(db);
-                        db.UsersData = null;
-                        db.Dispose();
+                        UpdateDatagrid(db);                        
                         MessageBox("Запись обновлена");
                     }
                     catch (DbUpdateConcurrencyException)
                     {
                         MessageBox("Запись заблокирована другим пользователем", System.Windows.MessageBoxImage.Warning);
-                        UpdateDatagrid(db);
-                        db.UsersData = null;
-                        db.Dispose();
+                        UpdateDatagrid(db);                        
                     }
                 }
             }
@@ -507,9 +498,7 @@ namespace WPF_EF_Core
                     {
                         db.UsersData.Remove(ud);
                         db.SaveChanges();
-                        UpdateDatagrid(db);
-                        db.UsersData = null;
-                        db.Dispose();
+                        UpdateDatagrid(db);                        
                     }
                     MessageBox("Запись удалена");                    
                     break;
@@ -523,9 +512,7 @@ namespace WPF_EF_Core
         {
             string database_type = this.database_type.Text.ToString();
             using ApplicationContext db = new(LoadConfiguration(database_type), database_type);
-            UpdateDatagrid(db);
-            db.UsersData = null;
-            db.Dispose();
+            UpdateDatagrid(db);            
         }
 
         private readonly SolidColorBrush hb = new(Colors.MistyRose);
@@ -573,9 +560,7 @@ namespace WPF_EF_Core
             is_filter = true;
             string database_type = this.database_type.Text.ToString();
             using ApplicationContext db = new(LoadConfiguration(database_type), database_type);
-            UpdateDatagrid(db);
-            db.UsersData = null;
-            db.Dispose();
+            UpdateDatagrid(db);            
         }
 
         // отменить фильтр
@@ -586,9 +571,7 @@ namespace WPF_EF_Core
             value2.Text = "";
             string database_type = this.database_type.Text.ToString();
             using ApplicationContext db = new(LoadConfiguration(database_type), database_type);
-            UpdateDatagrid(db);
-            db.UsersData = null;
-            db.Dispose();
+            UpdateDatagrid(db);            
         }      
 
         // изменение типа данных
