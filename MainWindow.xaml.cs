@@ -76,6 +76,28 @@ namespace WPF_EF_Core
         public string Name { get; set; }
     }
 
+    public class UserLogin
+    {
+        private string loginValue;
+        private string passwordValue;
+        public string LoginValue
+        {
+            get { return loginValue; }
+            set { loginValue = value; OnPropertyChanged("LoginValue"); }
+        }
+        public string PasswordValue
+        {
+            get { return passwordValue; }
+            set { passwordValue = value; OnPropertyChanged("PasswordValue"); }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        public void OnPropertyChanged([CallerMemberName] string prop = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
+        }
+    }
+
     public class ApplicationContext : DbContext
     {
         public DbSet<UserData> UsersData { get; set; }
@@ -95,11 +117,13 @@ namespace WPF_EF_Core
                         throw new ArgumentException(e.Message);
                     }                        
                 }
-                } else 
-              Database.EnsureCreated();            
+                } 
+            else if (p_database_type == "Azure SQL Database") { /*Ничего не делаем база уже создана*/ }
+            else 
+              Database.EnsureCreated();
 
             //Database.EnsureDeleted();   // удаляем бд со старой схемой
-            //Database.EnsureCreated();   // создаем бд с новой схемой
+            //Database.EnsureCreated();   // создаем бд с новой схемой            
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -111,10 +135,10 @@ namespace WPF_EF_Core
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
-    {
-        ApplicationContext db;
+    {        
         readonly bool is_initialize = true;
-        bool is_filter = false;        
+        bool is_filter = false;
+        static string ConnectionStringGlobal = "";        
 
         public MainWindow()
         {
@@ -123,7 +147,11 @@ namespace WPF_EF_Core
             AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
             is_initialize = false;
-            UpdateDatagrid();
+            string database_type = "MS SQL Server Local";
+            using ApplicationContext db = new(LoadConfiguration(database_type), database_type);
+            UpdateDatagrid(db);            
+            db.UsersData = null;
+            db.Dispose();
         }
 
         // загрузить NuGet
@@ -144,10 +172,79 @@ namespace WPF_EF_Core
             else if (database_type == "MySQL") conn_string = "DefaultConnectionMySQL";
             else if (database_type == "SQLite") conn_string = "DefaultConnectionSQLite";
             else if (database_type == "PostgreSQL") conn_string = "DefaultConnectionPostgreSQL";
+            else if (database_type == "Azure SQL Database") conn_string = "DefaultConnectionAzureSQL";
 
             // строка подключения
             string connectionString = config.GetConnectionString(conn_string);
             var optionsBuilder = new DbContextOptionsBuilder<ApplicationContext>();
+            
+            // разбираем строку подключения
+            string[] parts = connectionString.Split(";");
+            string LoginValue = ""; string LoginText = ""; string LoginName = "";
+            string PasswordValue = ""; string PasswordText = ""; string PasswordName = "";
+            foreach (string part in parts)
+            {
+                if (string.IsNullOrEmpty(part)) continue;                
+                string partn = part.Replace(" ", "").ToLower();
+
+                if ((conn_string == "DefaultConnectionSQLite") || (partn.Contains("trusted_connection=true")))
+                {
+                    LoginValue = "+"; PasswordValue = "+";
+                    break;
+                }                                        
+
+                if (partn.Contains("userid=")) {
+                    LoginText = part;
+                    LoginName = part[0..(part.IndexOf("="))];
+                    LoginValue = part[(part.IndexOf("=") + 1)..].Replace(" ","");
+                }
+                if (partn.Contains("user=")) {
+                    LoginText = part;
+                    LoginName = part[0..(part.IndexOf("="))];
+                    LoginValue = part[(part.IndexOf("=") + 1)..].Replace(" ", "");
+                }
+                if (partn.Contains("username=")) {
+                    LoginText = part;
+                    LoginName = part[0..(part.IndexOf("="))];
+                    LoginValue = part[(part.IndexOf("=") + 1)..].Replace(" ", "");
+                }
+                if (partn.Contains("Password=")) {
+                    PasswordText = part;
+                    PasswordName = part[0..(part.IndexOf("="))];
+                    PasswordValue = part[(part.IndexOf("=") + 1)..].Replace(" ", "");
+                }
+                if (partn.Contains("password=")) {
+                    PasswordText = part;
+                    PasswordName = part[0..(part.IndexOf("="))];
+                    PasswordValue = part[(part.IndexOf("=") + 1)..].Replace(" ", "");
+                }
+            }            
+
+            // вызываем если нужно форму для ввода логина и пароля
+            if ((LoginValue == "" || PasswordValue == "") && ConnectionStringGlobal == "")
+            {
+                PasswordWindow passWin = new(new UserLogin { LoginValue = LoginValue, PasswordValue = PasswordValue});
+                if (passWin.ShowDialog() == true)
+                {
+                    UserLogin ul = passWin.UserLoginAdd;
+                    if (ul != null)
+                    {
+                        if (LoginValue == "")
+                        {
+                            connectionString = connectionString.Replace(LoginText, LoginName + "=" + ul.LoginValue);
+                            ConnectionStringGlobal = connectionString;
+                        }
+                        if (PasswordValue == "")
+                        {
+                            connectionString = connectionString.Replace(PasswordText, PasswordName + "=" + ul.PasswordValue);
+                            ConnectionStringGlobal = connectionString;
+                        }                        
+                    }
+                }
+            }
+
+            // сохраняем строку подключения
+            if (ConnectionStringGlobal == "") { ConnectionStringGlobal = connectionString; }            
 
             // MS SQL Server Local по умолчанию
             var options = optionsBuilder
@@ -203,6 +300,14 @@ namespace WPF_EF_Core
                     .UseLoggerFactory(MyLoggerFactory)                                        
                     .Options;                
             }
+            else if (database_type == "Azure SQL Database")
+            {
+                optionsBuilder = new DbContextOptionsBuilder<ApplicationContext>();
+                options = optionsBuilder
+                    .UseSqlServer(connectionString)
+                    .UseLoggerFactory(MyLoggerFactory)
+                    .Options;
+            }
 
             return options;
         }
@@ -232,11 +337,9 @@ namespace WPF_EF_Core
             //builder.AddConsole();
         });
 
-        private void UpdateDatagrid()
-        {            
-
+        private void UpdateDatagrid(ApplicationContext db)                
+        {
             if (is_initialize == true) return;
-
             if (is_filter == false)
             {
                 DataGrid1.ItemsSource = db.UsersData.ToList();                
@@ -303,22 +406,19 @@ namespace WPF_EF_Core
                 }             
             }            
         }
-
-        // чтение данных базы данных
-        private void ReadDatabase(String database_type)
-        {            
-            db = new ApplicationContext(LoadConfiguration(database_type), database_type);
-        }
-
+        
         // изменение типа базы данных
         private void Database_type_SelectedIndexChanged(object sender, SelectionChangedEventArgs e)
         {
             ComboBox comboBox = (ComboBox)sender;
             ComboBoxItem selectedItem = (ComboBoxItem)comboBox.SelectedItem;
             String database_type = selectedItem.Content.ToString();
-            //
-            ReadDatabase(database_type);            
-            UpdateDatagrid();
+            ConnectionStringGlobal = "";
+            //            
+            using ApplicationContext db = new(LoadConfiguration(database_type), database_type);
+            UpdateDatagrid(db);
+            db.UsersData = null;
+            db.Dispose();
         }
 
         // добавить запись
@@ -328,11 +428,13 @@ namespace WPF_EF_Core
             if (addWin.ShowDialog() == true)
             {                
                 UserData ud = addWin.UserDataAdd;
-                db.UsersData.Add(ud);                
+                string database_type = this.database_type.Text.ToString();
+                using ApplicationContext db = new(LoadConfiguration(database_type), database_type);
+                db.UsersData.Add(ud);
                 db.SaveChanges();
-                //
-                ReadDatabase(this.database_type.Text.ToString());
-                UpdateDatagrid();
+                UpdateDatagrid(db);
+                db.UsersData = null;
+                db.Dispose();
             }            
         }
 
@@ -357,6 +459,8 @@ namespace WPF_EF_Core
             if (addWin.ShowDialog() == true)
             {
                 // получаем измененный объект
+                string database_type = this.database_type.Text.ToString();
+                using ApplicationContext db = new(LoadConfiguration(database_type), database_type);
                 ud = db.UsersData.Find(addWin.UserDataAdd.Id);
                 if (ud != null)
                 {
@@ -370,16 +474,17 @@ namespace WPF_EF_Core
                     {
                         db.Entry(ud).State = EntityState.Modified;
                         db.SaveChanges();
-                        //
-                        ReadDatabase(this.database_type.Text.ToString());
-                        UpdateDatagrid();
+                        UpdateDatagrid(db);
+                        db.UsersData = null;
+                        db.Dispose();
                         MessageBox("Запись обновлена");
                     }
                     catch (DbUpdateConcurrencyException)
                     {
                         MessageBox("Запись заблокирована другим пользователем", System.Windows.MessageBoxImage.Warning);
-                        ReadDatabase(this.database_type.Text.ToString());
-                        UpdateDatagrid();
+                        UpdateDatagrid(db);
+                        db.UsersData = null;
+                        db.Dispose();
                     }
                 }
             }
@@ -397,11 +502,15 @@ namespace WPF_EF_Core
                 case MessageBoxResult.Yes:
                     // получаем выделенный объект
                     UserData ud = DataGrid1.SelectedItem as UserData;
-                    db.UsersData.Remove(ud);
-                    db.SaveChanges();
-                    //
-                    ReadDatabase(this.database_type.Text.ToString());
-                    UpdateDatagrid();
+                    string database_type = this.database_type.Text.ToString();
+                    using (ApplicationContext db = new(LoadConfiguration(database_type), database_type))
+                    {
+                        db.UsersData.Remove(ud);
+                        db.SaveChanges();
+                        UpdateDatagrid(db);
+                        db.UsersData = null;
+                        db.Dispose();
+                    }
                     MessageBox("Запись удалена");                    
                     break;
                 case MessageBoxResult.No:                    
@@ -411,9 +520,12 @@ namespace WPF_EF_Core
 
         // обновить запись
         private void Button_selectClick(object sender, RoutedEventArgs e)
-        {            
-            ReadDatabase(this.database_type.Text.ToString());
-            UpdateDatagrid();
+        {
+            string database_type = this.database_type.Text.ToString();
+            using ApplicationContext db = new(LoadConfiguration(database_type), database_type);
+            UpdateDatagrid(db);
+            db.UsersData = null;
+            db.Dispose();
         }
 
         private readonly SolidColorBrush hb = new(Colors.MistyRose);
@@ -459,8 +571,11 @@ namespace WPF_EF_Core
         private void Button_findClick(object sender, RoutedEventArgs e)
         {
             is_filter = true;
-            ReadDatabase(this.database_type.Text.ToString());
-            UpdateDatagrid();
+            string database_type = this.database_type.Text.ToString();
+            using ApplicationContext db = new(LoadConfiguration(database_type), database_type);
+            UpdateDatagrid(db);
+            db.UsersData = null;
+            db.Dispose();
         }
 
         // отменить фильтр
@@ -469,8 +584,11 @@ namespace WPF_EF_Core
             is_filter = false;
             value1.Text = "";
             value2.Text = "";
-            ReadDatabase(this.database_type.Text.ToString());
-            UpdateDatagrid();
+            string database_type = this.database_type.Text.ToString();
+            using ApplicationContext db = new(LoadConfiguration(database_type), database_type);
+            UpdateDatagrid(db);
+            db.UsersData = null;
+            db.Dispose();
         }      
 
         // изменение типа данных
