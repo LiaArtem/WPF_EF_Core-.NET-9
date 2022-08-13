@@ -12,6 +12,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore.Design;
 using System.Globalization;
 using System.ComponentModel.DataAnnotations;
+using IBM.EntityFrameworkCore;
+using IBM.EntityFrameworkCore.Storage.Internal;
 
 namespace WPF_EF_Core
 {    
@@ -118,7 +120,7 @@ namespace WPF_EF_Core
                     }                        
                 }
                 } 
-            else if (p_database_type == "Azure SQL Database") { /*Ничего не делаем база уже создана*/ }
+            else if (p_database_type == "Azure SQL Database" || p_database_type == "IBM DB2") { /*Ничего не делаем база уже создана*/ }
             else 
               Database.EnsureCreated();
 
@@ -171,6 +173,7 @@ namespace WPF_EF_Core
             else if (database_type == "SQLite") conn_string = "DefaultConnectionSQLite";
             else if (database_type == "PostgreSQL") conn_string = "DefaultConnectionPostgreSQL";
             else if (database_type == "Azure SQL Database") conn_string = "DefaultConnectionAzureSQL";
+            else if (database_type == "IBM DB2") conn_string = "DefaultConnectionIBMDB2";
 
             // строка подключения
             string connectionString = config.GetConnectionString(conn_string);
@@ -304,6 +307,14 @@ namespace WPF_EF_Core
                 optionsBuilder = new DbContextOptionsBuilder<ApplicationContext>();
                 options = optionsBuilder
                     .UseSqlServer(connectionString)
+                    .UseLoggerFactory(MyLoggerFactory)
+                    .Options;
+            }
+            else if (database_type == "IBM DB2")
+            {
+                optionsBuilder = new DbContextOptionsBuilder<ApplicationContext>();
+                options = optionsBuilder
+                    .UseDb2(connectionString, p => p.SetServerInfo(IBMDBServerType.LUW, IBMDBServerVersion.LUW_11_01_2020))
                     .UseLoggerFactory(MyLoggerFactory)
                     .Options;
             }
