@@ -114,7 +114,7 @@ namespace WPF_EF_Core
                 }
                 catch (Oracle.ManagedDataAccess.Client.OracleException e)
                 {
-                    if (!e.Message.StartsWith("ORA-00955: name is already used by an existing object"))
+                    if (!e.Message.StartsWith("ORA-00955:"))  //  имя уже задействовано для существующего объекта
                     {
                         throw new ArgumentException(e.Message);
                     }                        

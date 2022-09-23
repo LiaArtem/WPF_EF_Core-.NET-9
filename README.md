@@ -5,7 +5,7 @@ WPF project - Test project using Entity Framework Core to the databases (Oracle,
 Azure SQL Database
  1) для работы необходимо в Azure создать базу данных - TestDB, пользователь admin-dbserver
     Сортировка - Cyrillic_General_CI_AS
- 2) перенести объекты скриптом ./SQL_Azure_Migration.sql
+ 2) перенести объекты скриптом ./sql/SQL_Azure_Migration.sql
 
 ---------------------------------------------------------------------------------
 IBM DB2
@@ -14,7 +14,7 @@ IBM DB2
     -> db2 connect to SAMPLE
     -> db2 grant DBADM on DATABASE to user db2admin
     -> db2 terminate
- 2) перенести объекты скриптом ./SQL_IBM_DB2_Migration.sql
+ 2) перенести объекты скриптом в DBeaver ./sql/SQL_IBM_DB2_Migration_1.sql, ./sql/SQL_IBM_DB2_Migration_2.sql
  3) Для тестирования и работы необходимо указать путь к драйверу IBM CLI.
     - Драйвер IBM CLI будет установлен автоматически при установке поставщика IBM Data Server для пакета EntityFramework Core.
     - По умолчанию драйвер IBM CLI будет расположен в <каталог установки пакета nuget>\<версия>\build\clidriver\bin:
