@@ -14,6 +14,7 @@ using System.Globalization;
 using System.ComponentModel.DataAnnotations;
 using IBM.EntityFrameworkCore;
 using IBM.EntityFrameworkCore.Storage.Internal;
+using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 
 namespace WPF_EF_Core
 {    
@@ -120,7 +121,7 @@ namespace WPF_EF_Core
                     }                        
                 }
                 } 
-            else if (p_database_type == "Azure SQL Database" || p_database_type == "IBM DB2") { /*Ничего не делаем база уже создана*/ }
+            else if (p_database_type == "Azure SQL Database" || p_database_type == "IBM DB2" || p_database_type == "IBM Informix") { /*Ничего не делаем база уже создана*/ }
             else 
               Database.EnsureCreated();
 
@@ -174,6 +175,9 @@ namespace WPF_EF_Core
             else if (database_type == "PostgreSQL") conn_string = "DefaultConnectionPostgreSQL";
             else if (database_type == "Azure SQL Database") conn_string = "DefaultConnectionAzureSQL";
             else if (database_type == "IBM DB2") conn_string = "DefaultConnectionIBMDB2";
+            else if (database_type == "MariaDB") conn_string = "DefaultConnectionMariaDB";            
+            else if (database_type == "IBM Informix") conn_string = "DefaultConnectionIBMInformix";
+            else if (database_type == "Firebird") conn_string = "DefaultConnectionFirebird";
 
             // строка подключения
             string connectionString = config.GetConnectionString(conn_string);
@@ -209,6 +213,12 @@ namespace WPF_EF_Core
                     LoginName = part[0..(part.IndexOf("="))];
                     LoginValue = part[(part.IndexOf("=") + 1)..].Replace(" ", "");
                 }
+                if (partn.Contains("uid="))
+                {
+                    LoginText = part;
+                    LoginName = part[0..(part.IndexOf("="))];
+                    LoginValue = part[(part.IndexOf("=") + 1)..].Replace(" ", "");
+                }
                 if (partn.Contains("Password=")) {
                     PasswordText = part;
                     PasswordName = part[0..(part.IndexOf("="))];
@@ -219,7 +229,13 @@ namespace WPF_EF_Core
                     PasswordName = part[0..(part.IndexOf("="))];
                     PasswordValue = part[(part.IndexOf("=") + 1)..].Replace(" ", "");
                 }
-            }            
+                if (partn.Contains("pwd="))
+                {
+                    PasswordText = part;
+                    PasswordName = part[0..(part.IndexOf("="))];
+                    PasswordValue = part[(part.IndexOf("=") + 1)..].Replace(" ", "");
+                }
+            }
 
             // вызываем если нужно форму для ввода логина и пароля
             if ((LoginValue == "" || PasswordValue == "") && ConnectionStringGlobal == "")
@@ -314,7 +330,31 @@ namespace WPF_EF_Core
             {
                 optionsBuilder = new DbContextOptionsBuilder<ApplicationContext>();
                 options = optionsBuilder
-                    .UseDb2(connectionString, p => p.SetServerInfo(IBMDBServerType.LUW, IBMDBServerVersion.LUW_11_01_2020))
+                    .UseDb2(connectionString, p => p.SetServerInfo(IBMDBServerType.LUW))
+                    .UseLoggerFactory(MyLoggerFactory)
+                    .Options;
+            }
+            else if (database_type == "MariaDB")
+            {
+                optionsBuilder = new DbContextOptionsBuilder<ApplicationContext>();
+                options = optionsBuilder
+                    .UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
+                    .UseLoggerFactory(MyLoggerFactory)
+                    .Options;
+            }
+            else if (database_type == "Firebird")
+            {
+                optionsBuilder = new DbContextOptionsBuilder<ApplicationContext>();
+                options = optionsBuilder
+                    .UseFirebird(connectionString)
+                    .UseLoggerFactory(MyLoggerFactory)
+                    .Options;
+            }
+            else if (database_type == "IBM Informix")
+            {
+                optionsBuilder = new DbContextOptionsBuilder<ApplicationContext>();
+                options = optionsBuilder
+                    .UseDb2(connectionString, p => p.SetServerInfo(IBMDBServerType.IDS))
                     .UseLoggerFactory(MyLoggerFactory)
                     .Options;
             }
