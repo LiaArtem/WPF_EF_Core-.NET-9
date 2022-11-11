@@ -150,9 +150,17 @@ namespace WPF_EF_Core
             AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
             is_initialize = false;
-            string database_type = "MS SQL Server Local";
-            using ApplicationContext db = new(LoadConfiguration(database_type), database_type);
-            UpdateDatagrid(db);            
+            string database_type = "SQLite";
+            try 
+            { 
+                using ApplicationContext db = new(LoadConfiguration(database_type), database_type);
+                UpdateDatagrid(db);
+            }
+            catch (Exception ex)
+            {
+                MessageBox(ex.Message, System.Windows.MessageBoxImage.Error);
+                DataGrid1.ItemsSource = null;
+            }
         }
 
         // загрузить NuGet
@@ -167,15 +175,15 @@ namespace WPF_EF_Core
             var config = builder.Build();
             // получаем строку подключения
             string conn_string = "";            
-            if (database_type == "MS SQL Server Local") conn_string = "DefaultConnection";
+            if (database_type == "SQLite") conn_string = "DefaultConnectionSQLite";
+            else if (database_type == "MS SQL Server Local") conn_string = "DefaultConnection";
             else if (database_type == "MS SQL Server") conn_string = "DefaultConnectionMSSQL";
-            else if (database_type == "Oracle") conn_string = "DefaultConnectionOracle";
-            else if (database_type == "MySQL") conn_string = "DefaultConnectionMySQL";
-            else if (database_type == "SQLite") conn_string = "DefaultConnectionSQLite";
-            else if (database_type == "PostgreSQL") conn_string = "DefaultConnectionPostgreSQL";
             else if (database_type == "Azure SQL Database") conn_string = "DefaultConnectionAzureSQL";
+            else if (database_type == "Oracle") conn_string = "DefaultConnectionOracle";
+            else if (database_type == "PostgreSQL") conn_string = "DefaultConnectionPostgreSQL";
+            else if (database_type == "MySQL") conn_string = "DefaultConnectionMySQL";
+            else if (database_type == "MariaDB") conn_string = "DefaultConnectionMariaDB";
             else if (database_type == "IBM DB2") conn_string = "DefaultConnectionIBMDB2";
-            else if (database_type == "MariaDB") conn_string = "DefaultConnectionMariaDB";            
             else if (database_type == "IBM Informix") conn_string = "DefaultConnectionIBMInformix";
             else if (database_type == "Firebird") conn_string = "DefaultConnectionFirebird";
 
@@ -392,7 +400,7 @@ namespace WPF_EF_Core
             if (is_initialize == true) return;
             if (is_filter == false)
             {
-                DataGrid1.ItemsSource = db.UsersData.ToList();                
+                DataGrid1.ItemsSource = db.UsersData.ToList();                 
             }
             else
             {
@@ -464,9 +472,17 @@ namespace WPF_EF_Core
             ComboBoxItem selectedItem = (ComboBoxItem)comboBox.SelectedItem;
             String database_type = selectedItem.Content.ToString();
             ConnectionStringGlobal = "";
-            //            
-            using ApplicationContext db = new(LoadConfiguration(database_type), database_type);
-            UpdateDatagrid(db);            
+            //
+            try
+            {
+                using ApplicationContext db = new(LoadConfiguration(database_type), database_type);
+                UpdateDatagrid(db);
+            }
+            catch (Exception ex)
+            {
+                MessageBox(ex.Message, System.Windows.MessageBoxImage.Error);
+                DataGrid1.ItemsSource = null;
+            }            
         }
 
         // добавить запись
@@ -477,10 +493,18 @@ namespace WPF_EF_Core
             {                
                 UserData ud = addWin.UserDataAdd;
                 string database_type = this.database_type.Text.ToString();
-                using ApplicationContext db = new(LoadConfiguration(database_type), database_type);
-                db.UsersData.Add(ud);
-                db.SaveChanges();
-                UpdateDatagrid(db);                
+                try
+                {
+                    using ApplicationContext db = new(LoadConfiguration(database_type), database_type);
+                    db.UsersData.Add(ud);
+                    db.SaveChanges();
+                    UpdateDatagrid(db);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox(ex.Message, System.Windows.MessageBoxImage.Error);
+                    DataGrid1.ItemsSource = null;
+                }
             }            
         }
 
@@ -506,28 +530,36 @@ namespace WPF_EF_Core
             {
                 // получаем измененный объект
                 string database_type = this.database_type.Text.ToString();
-                using ApplicationContext db = new(LoadConfiguration(database_type), database_type);
-                ud = db.UsersData.Find(addWin.UserDataAdd.Id);
-                if (ud != null)
+                try 
                 {
-                    ud.TextValue = addWin.UserDataAdd.TextValue;
-                    ud.IntValue = addWin.UserDataAdd.IntValue;
-                    ud.DoubleValue = addWin.UserDataAdd.DoubleValue;
-                    ud.BoolValue = addWin.UserDataAdd.BoolValue;
-                    ud.DateValue = addWin.UserDataAdd.DateValue;
+                    using ApplicationContext db = new(LoadConfiguration(database_type), database_type);
+                    ud = db.UsersData.Find(addWin.UserDataAdd.Id);
+                    if (ud != null)
+                    {
+                        ud.TextValue = addWin.UserDataAdd.TextValue;
+                        ud.IntValue = addWin.UserDataAdd.IntValue;
+                        ud.DoubleValue = addWin.UserDataAdd.DoubleValue;
+                        ud.BoolValue = addWin.UserDataAdd.BoolValue;
+                        ud.DateValue = addWin.UserDataAdd.DateValue;
 
-                    try
-                    {
-                        db.Entry(ud).State = EntityState.Modified;
-                        db.SaveChanges();
-                        UpdateDatagrid(db);                        
-                        MessageBox("Запись обновлена");
+                        try
+                        {
+                            db.Entry(ud).State = EntityState.Modified;
+                            db.SaveChanges();
+                            UpdateDatagrid(db);                        
+                            MessageBox("Запись обновлена");
+                        }
+                        catch (DbUpdateConcurrencyException)
+                        {
+                            MessageBox("Запись заблокирована другим пользователем", System.Windows.MessageBoxImage.Warning);
+                            UpdateDatagrid(db);                        
+                        }
                     }
-                    catch (DbUpdateConcurrencyException)
-                    {
-                        MessageBox("Запись заблокирована другим пользователем", System.Windows.MessageBoxImage.Warning);
-                        UpdateDatagrid(db);                        
-                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox(ex.Message, System.Windows.MessageBoxImage.Error);
+                    DataGrid1.ItemsSource = null;
                 }
             }
         }
@@ -545,11 +577,19 @@ namespace WPF_EF_Core
                     // получаем выделенный объект
                     UserData ud = DataGrid1.SelectedItem as UserData;
                     string database_type = this.database_type.Text.ToString();
-                    using (ApplicationContext db = new(LoadConfiguration(database_type), database_type))
+                    try 
+                    { 
+                        using (ApplicationContext db = new(LoadConfiguration(database_type), database_type))
+                        {
+                            db.UsersData.Remove(ud);
+                            db.SaveChanges();
+                            UpdateDatagrid(db);                        
+                        }
+                    }
+                    catch (Exception ex)
                     {
-                        db.UsersData.Remove(ud);
-                        db.SaveChanges();
-                        UpdateDatagrid(db);                        
+                        MessageBox(ex.Message, System.Windows.MessageBoxImage.Error);
+                        DataGrid1.ItemsSource = null;
                     }
                     MessageBox("Запись удалена");                    
                     break;
@@ -562,8 +602,16 @@ namespace WPF_EF_Core
         private void Button_selectClick(object sender, RoutedEventArgs e)
         {
             string database_type = this.database_type.Text.ToString();
-            using ApplicationContext db = new(LoadConfiguration(database_type), database_type);
-            UpdateDatagrid(db);            
+            try 
+            { 
+                using ApplicationContext db = new(LoadConfiguration(database_type), database_type);
+                UpdateDatagrid(db);
+            }
+            catch (Exception ex)
+            {
+                MessageBox(ex.Message, System.Windows.MessageBoxImage.Error);
+                DataGrid1.ItemsSource = null;
+            }
         }
 
         private readonly SolidColorBrush hb = new(Colors.MistyRose);
@@ -610,8 +658,16 @@ namespace WPF_EF_Core
         {
             is_filter = true;
             string database_type = this.database_type.Text.ToString();
-            using ApplicationContext db = new(LoadConfiguration(database_type), database_type);
-            UpdateDatagrid(db);            
+            try 
+            { 
+                using ApplicationContext db = new(LoadConfiguration(database_type), database_type);
+                UpdateDatagrid(db);
+            }
+            catch (Exception ex)
+            {
+                MessageBox(ex.Message, System.Windows.MessageBoxImage.Error);
+                DataGrid1.ItemsSource = null;
+            }
         }
 
         // отменить фильтр
@@ -621,8 +677,16 @@ namespace WPF_EF_Core
             value1.Text = "";
             value2.Text = "";
             string database_type = this.database_type.Text.ToString();
-            using ApplicationContext db = new(LoadConfiguration(database_type), database_type);
-            UpdateDatagrid(db);            
+            try 
+            { 
+                using ApplicationContext db = new(LoadConfiguration(database_type), database_type);
+                UpdateDatagrid(db);
+            }
+            catch (Exception ex)
+            {
+                MessageBox(ex.Message, System.Windows.MessageBoxImage.Error);
+                DataGrid1.ItemsSource = null;
+            }
         }      
 
         // изменение типа данных
