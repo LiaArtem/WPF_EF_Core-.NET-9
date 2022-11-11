@@ -68,6 +68,12 @@
     <None Update="sql\SQL_IBM_DB2_Migration_2.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="sql\SQL_IBM_Informix_Migration_1.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="sql\SQL_IBM_Informix_Migration_2.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="SQL_Azure_Migration.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
