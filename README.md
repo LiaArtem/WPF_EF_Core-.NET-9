@@ -1,4 +1,4 @@
-# WPF_EF_Core-.NET-6
+# WPF_EF_Core-.NET-7
 WPF project - Test project using Entity Framework Core to the databases (Oracle, MS SQL, Azure SQL, PostgreSQL, MySQL, MariaDB, IBM DB2, IBM Informix, Firebird, SQLite).
 
 ---------------------------------------------------------------------------------

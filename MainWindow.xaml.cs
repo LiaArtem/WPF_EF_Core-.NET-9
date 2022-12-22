@@ -15,6 +15,8 @@ using System.ComponentModel.DataAnnotations;
 using IBM.EntityFrameworkCore;
 using IBM.EntityFrameworkCore.Storage.Internal;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
+using System.Collections.Generic;
+using System.Windows.Documents;
 
 namespace WPF_EF_Core
 {    
@@ -149,6 +151,13 @@ namespace WPF_EF_Core
 
             AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
+            // пока не поддерживает .net 7.0            
+            this.database_type.Items.RemoveAt(6); // MySQL
+            this.database_type.Items.RemoveAt(6); // MariaDB
+            this.database_type.Items.RemoveAt(6); // IBM DB2
+            this.database_type.Items.RemoveAt(6); // IBM Informix
+            this.database_type.Items.RemoveAt(6); // Firebird
+
             is_initialize = false;
             string database_type = "SQLite";
             try 
@@ -176,7 +185,7 @@ namespace WPF_EF_Core
             // получаем строку подключения
             string conn_string = "";            
             if (database_type == "SQLite") conn_string = "DefaultConnectionSQLite";
-            else if (database_type == "MS SQL Server Local") conn_string = "DefaultConnection";
+            else if (database_type == "MS SQL Server Local") conn_string = "DefaultConnectionMSSQLLocal";
             else if (database_type == "MS SQL Server") conn_string = "DefaultConnectionMSSQL";
             else if (database_type == "Azure SQL Database") conn_string = "DefaultConnectionAzureSQL";
             else if (database_type == "Oracle") conn_string = "DefaultConnectionOracle";
