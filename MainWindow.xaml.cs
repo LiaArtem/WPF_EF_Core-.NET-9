@@ -149,14 +149,7 @@ namespace WPF_EF_Core
         {
             InitializeComponent();
 
-            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
-
-            // пока не поддерживает .net 7.0            
-            this.database_type.Items.RemoveAt(6); // MySQL
-            this.database_type.Items.RemoveAt(6); // MariaDB
-            this.database_type.Items.RemoveAt(6); // IBM DB2
-            this.database_type.Items.RemoveAt(6); // IBM Informix
-            this.database_type.Items.RemoveAt(6); // Firebird
+            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);            
 
             is_initialize = false;
             string database_type = "SQLite";
@@ -481,6 +474,14 @@ namespace WPF_EF_Core
             ComboBoxItem selectedItem = (ComboBoxItem)comboBox.SelectedItem;
             String database_type = selectedItem.Content.ToString();
             ConnectionStringGlobal = "";
+
+            // пока не поддерживает .net 7.0            
+            if (database_type == "MySQL" || database_type == "IBM DB2" || database_type == "IBM Informix" || database_type == "Firebird")
+            {
+                MessageBox("Пока не поддерживает .NET 7.0", System.Windows.MessageBoxImage.Error);
+                DataGrid1.ItemsSource = null;
+                return;
+            }            
             //
             try
             {
@@ -587,13 +588,11 @@ namespace WPF_EF_Core
                     UserData ud = DataGrid1.SelectedItem as UserData;
                     string database_type = this.database_type.Text.ToString();
                     try 
-                    { 
-                        using (ApplicationContext db = new(LoadConfiguration(database_type), database_type))
-                        {
-                            db.UsersData.Remove(ud);
-                            db.SaveChanges();
-                            UpdateDatagrid(db);                        
-                        }
+                    {
+                        using ApplicationContext db = new(LoadConfiguration(database_type), database_type);
+                        db.UsersData.Remove(ud);
+                        db.SaveChanges();
+                        UpdateDatagrid(db);
                     }
                     catch (Exception ex)
                     {
