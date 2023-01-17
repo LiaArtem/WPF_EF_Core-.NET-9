@@ -18,7 +18,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="FirebirdSql.EntityFrameworkCore.Firebird" Version="9.1.0" />
+    <PackageReference Include="FirebirdSql.EntityFrameworkCore.Firebird" Version="9.1.1" />
     <PackageReference Include="IBM.EntityFrameworkCore" Version="6.0.0.300" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.2">
@@ -40,7 +40,7 @@
     <PackageReference Include="Net.IBM.Data.Db2" Version="6.0.0.300" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.1" />
     <PackageReference Include="Oracle.EntityFrameworkCore" Version="7.21.8" />
-    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="7.0.0-silver.1" />
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="7.0.0" />
   </ItemGroup>
 
   <ItemGroup>
