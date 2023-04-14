@@ -9,7 +9,7 @@ Azure SQL Database
 
 ---------------------------------------------------------------------------------
 MySQL та MariaDB
-  - якщо встановлюємо дві бази, буде проблема, оскільки вони використовують один порт для роботи за замовчуванням 3306.
+  - якщо встановлюємо дві бази, буде проблема, оскільки вони використовують один порт для роботи за замовчуванням 3306
     - для MySQL ставимо порт за замовчуванням = 3306
     - для MariaDB ставимо порт за замовчуванням = 3307
 
@@ -21,9 +21,9 @@ IBM DB2
     -> db2 grant DBADM on DATABASE to user db2admin
     -> db2 terminate
  2) перенести об'єкти скриптом в DBeaver ./sql/SQL_IBM_DB2_Migration_1.sql, ./sql/SQL_IBM_DB2_Migration_2.sql
- 3) для тестування та роботи необхідно вказати шлях до драйвера IBM CLI.
-    - драйвер IBM CLI буде встановлений автоматично під час встановлення постачальника IBM Data Server для пакета EntityFramework Core.
-    - за замовчуванням драйвер IBM CLI буде розташований у <каталог установки пакета nuget>\<версія>\build\clidriver\bin:
+ 3) для тестування та роботи необхідно вказати шлях до драйвера IBM CLI
+    - драйвер IBM CLI буде встановлений автоматично під час встановлення постачальника IBM Data Server для пакета EntityFramework Core
+    - за замовчуванням драйвер IBM CLI буде розташований у <каталог установки пакета nuget>\<версія>\build\clidriver\bin
     - у Windows змініть змінне середовище PATH, щоб воно містило %userprofile%\.nuget\packages\IBM.Data.DB2.Core\<версія>\build\clidriver\bin
     - перезапустіть програму
     - завантажити та розпакувати clidriver (https://www.ibm.com/support/pages/db2-odbc-cli-driver-download-and-installation-information)
@@ -46,8 +46,8 @@ IBM Informix
      - password: 12345678
   4) створюємо базу даних SAMPLE скриптом у DBeaver./sql/SQL_IBM_DB2_Migration_1.sql
   5) перепідключаємо з'єднання DBeaver на базу SAMPLE і виконуємо скрипт ./sql/SQL_IBM_DB2_Migration_2.sql
-  6) для тестування та роботи необхідно вказати шлях до драйвера IBM CLI.
-    - драйвер IBM CLI буде встановлений автоматично під час встановлення постачальника IBM Data Server для пакета EntityFramework Core.
+  6) для тестування та роботи необхідно вказати шлях до драйвера IBM CLI
+    - драйвер IBM CLI буде встановлений автоматично під час встановлення постачальника IBM Data Server для пакета EntityFramework Core
     - за замовчуванням драйвер IBM CLI буде розташований у <каталог установки пакета nuget>\<версія>\build\clidriver\bin:
     - у Windows змініть змінне середовище PATH, щоб воно містило %userprofile%\.nuget\packages\IBM.Data.DB2.Core\<версія>\build\clidriver\bin
     - перезапустіть програму
@@ -59,7 +59,7 @@ IBM Informix
 ---------------------------------------------------------------------------------
 Міграція об'єктів засобами EF Core
 Для створення та виконання міграції перейдемо у Visual Studio до вікна Package Manager Console
-(Средства > Диспетчер пакетів NuGet > Консоль диспетчера пакетів).
+(Средства > Диспетчер пакетів NuGet > Консоль диспетчера пакетів)
   - введемо команду -> Add-Migration InitialCreate
   - введемо команду -> Update-Database
 
