@@ -21,13 +21,13 @@ IBM DB2
     -> db2 grant DBADM on DATABASE to user db2admin
     -> db2 terminate
  2) перенести об'єкти скриптом в DBeaver ./sql/SQL_IBM_DB2_Migration_1.sql, ./sql/SQL_IBM_DB2_Migration_2.sql
- 3) Для тестування та роботи необхідно вказати шлях до драйвера IBM CLI.
-    - Драйвер IBM CLI буде встановлений автоматично під час встановлення постачальника IBM Data Server для пакета EntityFramework Core.
-    - За замовчуванням драйвер IBM CLI буде розташований у <каталог установки пакета nuget>\<версія>\build\clidriver\bin:
-    - У Windows змініть змінне середовище PATH, щоб воно містило %userprofile%\.nuget\packages\IBM.Data.DB2.Core\<версія>\build\clidriver\bin
-    - Перезапустіть програму.
+ 3) для тестування та роботи необхідно вказати шлях до драйвера IBM CLI.
+    - драйвер IBM CLI буде встановлений автоматично під час встановлення постачальника IBM Data Server для пакета EntityFramework Core.
+    - за замовчуванням драйвер IBM CLI буде розташований у <каталог установки пакета nuget>\<версія>\build\clidriver\bin:
+    - у Windows змініть змінне середовище PATH, щоб воно містило %userprofile%\.nuget\packages\IBM.Data.DB2.Core\<версія>\build\clidriver\bin
+    - перезапустіть програму
     - завантажити та розпакувати clidriver (https://www.ibm.com/support/pages/db2-odbc-cli-driver-download-and-installation-information)
-    - За замовчуванням мої настройки: програма розташована ..\Project\Project C#\WPF_EF_Core
+    - за замовчуванням мої настройки: програма розташована ..\Project\Project C#\WPF_EF_Core
       папка clidriver має бути розташована ..\Project\clidriver
 
 ---------------------------------------------------------------------------------
@@ -46,14 +46,14 @@ IBM Informix
      - password: 12345678
   4) створюємо базу даних SAMPLE скриптом у DBeaver./sql/SQL_IBM_DB2_Migration_1.sql
   5) перепідключаємо з'єднання DBeaver на базу SAMPLE і виконуємо скрипт ./sql/SQL_IBM_DB2_Migration_2.sql
-  6) Для тестування та роботи необхідно вказати шлях до драйвера IBM CLI.
-    - Драйвер IBM CLI буде встановлений автоматично під час встановлення постачальника IBM Data Server для пакета EntityFramework Core.
-    - За замовчуванням драйвер IBM CLI буде розташований у <каталог установки пакета nuget>\<версія>\build\clidriver\bin:
-    - У Windows змініть змінне середовище PATH, щоб воно містило %userprofile%\.nuget\packages\IBM.Data.DB2.Core\<версія>\build\clidriver\bin
-    - Перезапустіть програму.
+  6) для тестування та роботи необхідно вказати шлях до драйвера IBM CLI.
+    - драйвер IBM CLI буде встановлений автоматично під час встановлення постачальника IBM Data Server для пакета EntityFramework Core.
+    - за замовчуванням драйвер IBM CLI буде розташований у <каталог установки пакета nuget>\<версія>\build\clidriver\bin:
+    - у Windows змініть змінне середовище PATH, щоб воно містило %userprofile%\.nuget\packages\IBM.Data.DB2.Core\<версія>\build\clidriver\bin
+    - перезапустіть програму
     - завантажити та розпакувати clidriver:
-      https://www.ibm.com/support/pages/db2-odbc-cli-driver-download-and-installation-information
-    - За замовчуванням мої настройки: програма розташована ..\Project\Project C#\WPF_EF_Core
+      - https://www.ibm.com/support/pages/db2-odbc-cli-driver-download-and-installation-information
+    - за замовчуванням мої настройки: програма розташована ..\Project\Project C#\WPF_EF_Core
       папка clidriver має бути розташована ..\Project\clidriver
 
 ---------------------------------------------------------------------------------
