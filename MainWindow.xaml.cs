@@ -476,7 +476,7 @@ namespace WPF_EF_Core
             ConnectionStringGlobal = "";
 
             // пока не поддерживает .net 7.0            
-            if (database_type == "IBM DB2" || database_type == "IBM Informix" || database_type == "Firebird")
+            if (database_type == "IBM Informix" || database_type == "Firebird")
             {
                 MessageBox("Пока не поддерживает .NET 7.0", System.Windows.MessageBoxImage.Error);
                 DataGrid1.ItemsSource = null;

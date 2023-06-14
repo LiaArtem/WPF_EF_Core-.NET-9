@@ -20,7 +20,7 @@ IBM DB2
     -> db2 connect to SAMPLE
     -> db2 grant DBADM on DATABASE to user db2admin
     -> db2 terminate
- 2) перенести об'єкти скриптом в DBeaver ./sql/SQL_IBM_DB2_Migration_1.sql, ./sql/SQL_IBM_DB2_Migration_2.sql
+ 2) перенести об'єкти скриптом в DBeaver ./sql/SQL_IBM_DB2_Migration.sql
  3) для тестування та роботи необхідно вказати шлях до драйвера IBM CLI
     - драйвер IBM CLI буде встановлений автоматично під час встановлення постачальника IBM Data Server для пакета EntityFramework Core
     - за замовчуванням драйвер IBM CLI буде розташований у <каталог установки пакета nuget>\<версія>\build\clidriver\bin
@@ -40,10 +40,10 @@ IBM Informix
      - Password: 12345678
   3) підключення DBeaver
      - host: localhost
-     - server: informix_test
+     - server: informix_test (Docker - informix)
      - database/schema: sysadmin
      - user: informix
-     - password: 12345678
+     - password: !Aa112233
   4) створюємо базу даних SAMPLE скриптом у DBeaver./sql/SQL_IBM_DB2_Migration_1.sql
   5) перепідключаємо з'єднання DBeaver на базу SAMPLE і виконуємо скрипт ./sql/SQL_IBM_DB2_Migration_2.sql
   6) для тестування та роботи необхідно вказати шлях до драйвера IBM CLI
