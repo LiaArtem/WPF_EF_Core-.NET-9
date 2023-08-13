@@ -475,10 +475,10 @@ namespace WPF_EF_Core
             String database_type = selectedItem.Content.ToString();
             ConnectionStringGlobal = "";
 
-            // пока не поддерживает .net 7.0            
+            // пока не поддерживает .net            
             if (database_type == "IBM Informix" || database_type == "Firebird")
             {
-                MessageBox("Пока не поддерживает .NET 7.0", System.Windows.MessageBoxImage.Error);
+                MessageBox("Пока не поддерживает текущую версию .NET, макс. версия .NET 6.0", System.Windows.MessageBoxImage.Error);
                 DataGrid1.ItemsSource = null;
                 return;
             }            
