@@ -20,15 +20,15 @@
   <ItemGroup>
     <PackageReference Include="FirebirdSql.EntityFrameworkCore.Firebird" Version="9.1.1" />
     <PackageReference Include="IBM.EntityFrameworkCore" Version="7.0.0.200" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.10" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.10">
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.11" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.11">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="7.0.10" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.10" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.10" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.10">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="7.0.11" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.11" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.11" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.11">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -38,7 +38,7 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="7.0.0" />
     <PackageReference Include="MySql.EntityFrameworkCore" Version="7.0.5" />
     <PackageReference Include="Net.IBM.Data.Db2" Version="7.0.0.200" />
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.4" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.11" />
     <PackageReference Include="Oracle.EntityFrameworkCore" Version="7.21.11" />
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="7.0.0" />
   </ItemGroup>
