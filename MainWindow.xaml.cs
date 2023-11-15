@@ -210,40 +210,40 @@ namespace WPF_EF_Core
 
                 if (partn.Contains("userid=")) {
                     LoginText = part;
-                    LoginName = part[0..(part.IndexOf("="))];
-                    LoginValue = part[(part.IndexOf("=") + 1)..].Replace(" ","");
+                    LoginName = part[0..(part.IndexOf(Convert.ToChar("=")))];
+                    LoginValue = part[(part.IndexOf(Convert.ToChar("=")) + 1)..].Replace(" ","");
                 }
                 if (partn.Contains("user=")) {
                     LoginText = part;
-                    LoginName = part[0..(part.IndexOf("="))];
-                    LoginValue = part[(part.IndexOf("=") + 1)..].Replace(" ", "");
+                    LoginName = part[0..(part.IndexOf(Convert.ToChar("=")))];
+                    LoginValue = part[(part.IndexOf(Convert.ToChar("=")) + 1)..].Replace(" ", "");
                 }
                 if (partn.Contains("username=")) {
                     LoginText = part;
-                    LoginName = part[0..(part.IndexOf("="))];
-                    LoginValue = part[(part.IndexOf("=") + 1)..].Replace(" ", "");
+                    LoginName = part[0..(part.IndexOf(Convert.ToChar("=")))];
+                    LoginValue = part[(part.IndexOf(Convert.ToChar("=")) + 1)..].Replace(" ", "");
                 }
                 if (partn.Contains("uid="))
                 {
                     LoginText = part;
-                    LoginName = part[0..(part.IndexOf("="))];
-                    LoginValue = part[(part.IndexOf("=") + 1)..].Replace(" ", "");
+                    LoginName = part[0..(part.IndexOf(Convert.ToChar("=")))];
+                    LoginValue = part[(part.IndexOf(Convert.ToChar("=")) + 1)..].Replace(" ", "");
                 }
                 if (partn.Contains("Password=")) {
                     PasswordText = part;
-                    PasswordName = part[0..(part.IndexOf("="))];
-                    PasswordValue = part[(part.IndexOf("=") + 1)..].Replace(" ", "");
+                    PasswordName = part[0..(part.IndexOf(Convert.ToChar("=")))];
+                    PasswordValue = part[(part.IndexOf(Convert.ToChar("=")) + 1)..].Replace(" ", "");
                 }
                 if (partn.Contains("password=")) {
                     PasswordText = part;
-                    PasswordName = part[0..(part.IndexOf("="))];
-                    PasswordValue = part[(part.IndexOf("=") + 1)..].Replace(" ", "");
+                    PasswordName = part[0..(part.IndexOf(Convert.ToChar("=")))];
+                    PasswordValue = part[(part.IndexOf(Convert.ToChar("=")) + 1)..].Replace(" ", "");
                 }
                 if (partn.Contains("pwd="))
                 {
                     PasswordText = part;
-                    PasswordName = part[0..(part.IndexOf("="))];
-                    PasswordValue = part[(part.IndexOf("=") + 1)..].Replace(" ", "");
+                    PasswordName = part[0..(part.IndexOf(Convert.ToChar("=")))];
+                    PasswordValue = part[(part.IndexOf(Convert.ToChar("=")) + 1)..].Replace(" ", "");
                 }
             }
 
@@ -437,7 +437,7 @@ namespace WPF_EF_Core
                 else if (value_type.Text == "bool")
                 {
                     m_value1_bool = false;
-                    if (m_value1.ToUpper() == "T" || m_value1.ToLower() == "true") m_value1_bool = true;
+                    if (m_value1.Equals("T", StringComparison.CurrentCultureIgnoreCase) || m_value1.Equals("true", StringComparison.CurrentCultureIgnoreCase)) m_value1_bool = true;
                     DataGrid1.ItemsSource = db.UsersData.ToList().Where(p => p.BoolValue == m_value1_bool);
                 }
                 else if (value_type.Text == "date")
@@ -481,7 +481,13 @@ namespace WPF_EF_Core
                 MessageBox("Пока не поддерживает текущую версию .NET, макс. версия .NET 6.0", System.Windows.MessageBoxImage.Error);
                 DataGrid1.ItemsSource = null;
                 return;
-            }            
+            }
+            if (database_type == "Oracle" || database_type == "MySQL" || database_type == "MariaDB" || database_type == "IBM DB2")
+            {
+                MessageBox("Пока не поддерживает текущую версию .NET, макс. версия .NET 7.0", System.Windows.MessageBoxImage.Error);
+                DataGrid1.ItemsSource = null;
+                return;
+            }
             //
             try
             {
