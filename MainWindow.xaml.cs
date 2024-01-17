@@ -110,7 +110,7 @@ namespace WPF_EF_Core
         public ApplicationContext(DbContextOptions<ApplicationContext> options, String p_database_type) : base(options)
         {
             if (p_database_type == "Oracle")
-            {
+            {                
                 try
                 {
                     Database.EnsureCreated();
@@ -482,7 +482,7 @@ namespace WPF_EF_Core
                 DataGrid1.ItemsSource = null;
                 return;
             }
-            if (database_type == "Oracle" || database_type == "MySQL" || database_type == "IBM DB2")
+            if (database_type == "IBM DB2")
             {
                 MessageBox("Пока не поддерживает текущую версию .NET, макс. версия .NET 7.0", System.Windows.MessageBoxImage.Error);
                 DataGrid1.ItemsSource = null;
