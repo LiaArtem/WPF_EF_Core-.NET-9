@@ -52,7 +52,7 @@ IBM Informix
      - у Windows змініть змінне середовище PATH, щоб воно містило %userprofile%\.nuget\packages\IBM.Data.DB2.Core\<версія>\build\clidriver\bin
      - перезапустіть програму
      - завантажити та розпакувати clidriver:
-       - https://www.ibm.com/support/pages/db2-odbc-cli-driver-download-and-installation-information
+       - https://www.ibm.com/support/pages/db2-odbc-cli-driver-download-and-installation-information (v11.5.9_ntx64_odbc_cli.zip)
      - за замовчуванням мої настройки: програма розташована ..\Project\Project C#\WPF_EF_Core
        папка clidriver має бути розташована ..\Project\clidriver
 
