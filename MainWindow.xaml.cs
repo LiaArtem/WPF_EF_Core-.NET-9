@@ -476,7 +476,7 @@ namespace WPF_EF_Core
             ConnectionStringGlobal = "";
 
             // пока не поддерживает .net            
-            if (database_type == "Oracle" ||database_type == "MySQL" || database_type == "MariaDB" || database_type == "IBM DB2")
+            if (database_type == "MySQL" || database_type == "IBM DB2")
             {
                 MessageBox("Пока не поддерживает текущую версию .NET, макс. версия .NET 8.0", System.Windows.MessageBoxImage.Error);
                 DataGrid1.ItemsSource = null;
