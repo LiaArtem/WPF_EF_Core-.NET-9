@@ -474,17 +474,9 @@ namespace WPF_EF_Core
             ComboBoxItem selectedItem = (ComboBoxItem)comboBox.SelectedItem;
             String database_type = selectedItem.Content.ToString();
             ConnectionStringGlobal = "";
-
+            
             // пока не поддерживает .net            
-            if (database_type == "IBM DB2")
-            {
-                MessageBox("Пока не поддерживает текущую версию .NET, макс. версия .NET 8.0", System.Windows.MessageBoxImage.Error);
-                DataGrid1.ItemsSource = null;
-                return;
-            }            
-
-            // пока не поддерживает .net            
-            if (database_type == "IBM Informix" || database_type == "Firebird")
+            if (database_type == "IBM Informix")
             {
                 MessageBox("Пока не поддерживает текущую версию .NET, макс. версия .NET 6.0", System.Windows.MessageBoxImage.Error);
                 DataGrid1.ItemsSource = null;
